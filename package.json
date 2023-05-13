@@ -1,0 +1,17 @@
+{
+  "name": "signin-signup-form-main",
+  "version": "1.0.0",
+  "description": "![Design and Development](https://github.com/JunaidShamnad/SignIn-SignUp-Form/blob/main/img/Login%20%26%20Registration%20Form.png)",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "speakeasy": "^2.0.0"
+  }
+}
