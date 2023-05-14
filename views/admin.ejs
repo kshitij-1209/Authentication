@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+
+    <style>
+        body {
+            background: linear-gradient(rgba(2, 226, 247, 0.507), rgba(255, 255, 255, 0.419));
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+
+        .container {
+            box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.616);
+            margin: 0 auto;
+            width: fit-content;
+            padding: 20px 20px;
+            margin-top: 100px;
+        }
+
+        a {
+            text-decoration: none;
+            border: 1px solid rgb(255, 255, 255);
+            font-size: 28px;
+            color: rgb(12, 97, 66);
+            padding: 0.25em 0.75em;
+        }
+
+        .alert-success {
+            color: rgb(43, 104, 28);
+            background-color: rgba(155, 233, 135, 0.627);
+        }
+
+        .alert-cont {
+            border-radius: 10px;
+            padding: 10px 10px;
+            font-size: 18;
+        }
+
+        .alert-error {
+            color: rgb(101, 54, 54);
+            background-color: rgba(224, 137, 137, 0.637);
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/flash') %>
+        <div class="container">
+            <h2>Welcome, <%= user.email %>
+            </h2>
+            <div class="btn-cont">
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+</body>
+
+</html>
