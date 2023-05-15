@@ -57,29 +57,9 @@ app.get('/', (req, res) => {
     res.render('index');
 })
 
-app.post('/register', catchAsync(async (req, res, next) => {
-    // try {
-    const { username, email, password } = req.body;
-    const user = new User({ username, email, password });
-    
-    const ifExists = await user.checkExists();
-    if(ifExists) {
-        req.flash('error', 'Username or email already exists !!!');
-        return req.redirect('/');
-    }
-    const x = await user.save();
 
-    req.session.user = email;
+// ------------------------------------------ login
 
-    const otp = new RegisterOtp({
-        expiresAt : Date.now() + 1000 * 30,
-        password: generateOtp()
-    })
-    otp.user_id = user;
-    await otp.save().then((d) => console.log(d));
-
-    res.redirect('/register/verify');
-}));
 
 app.post('/login', catchAsync( async(req, res) => {
     const { username, password } = req.body;
@@ -117,12 +97,6 @@ app.post('/login', catchAsync( async(req, res) => {
 app.get('/login/verify', catchAsync(async (req, res) => {
     res.render('loginotp');
 }))
-
-
-app.get('/register/verify', catchAsync(async (req, res) => {
-    res.render('otp');
-}))
-
 
 
 app.post('/login/verify', catchAsync(async (req, res) => {
@@ -172,30 +146,36 @@ app.get('/login/verify/resend', catchAsync(async (req, res) => {
     res.redirect('/login/verify');
 }))
 
+// ----------------------------------------- register
+
+app.get('/register/verify', catchAsync(async (req, res) => {
+    res.render('otp');
+}))
 
 
+app.post('/register', catchAsync(async (req, res, next) => {
+    // try {
+    const { username, email, password } = req.body;
+    const user = new User({ username, email, password });
+    
+    const ifExists = await user.checkExists();
+    if(ifExists) {
+        req.flash('error', 'Username or email already exists !!!');
+        return req.redirect('/');
+    }
+    const x = await user.save();
 
+    req.session.user = email;
 
+    const otp = new RegisterOtp({
+        expiresAt : Date.now() + 1000 * 30,
+        password: generateOtp()
+    })
+    otp.user_id = user;
+    await otp.save().then((d) => console.log(d));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    res.redirect('/register/verify');
+}));
 
 
 app.post('/register/verify', catchAsync(async (req, res) => {
