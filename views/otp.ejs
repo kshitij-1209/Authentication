@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Verify</title>
+    <style>
+        body {
+            background: #908c8c;
+        }
+
+        .container {
+            width: fit-content;
+            padding: 40px 40px;
+            margin: 0 auto;
+
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+
+            margin-top: 100px;
+        }
+
+        .bgWhite {
+            background: white;
+            box-shadow: 0px 6px 8px 0px #2625259a;
+        }
+
+        .title {
+            font-weight: 600;
+            /* margin-top: 20px; */
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .customBtn {
+            border: none;
+            font-size: 20px;
+            border-radius: 5px;
+
+            padding: 0.5em 0.75em;
+            width: 100%;
+            color: white;
+            background-color: rgb(19, 172, 189);
+
+            /* margin-top: 40px; */
+            cursor: pointer;
+        }
+
+        .customBtn:hover {
+            opacity: 0.8;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        form input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .alert-success {
+            color: rgb(43, 104, 28);
+            background-color: rgba(155, 233, 135, 0.627);
+        }
+
+        .alert-cont {
+            border-radius: 10px;
+            padding: 10px 10px;
+            font-size: 18;
+        }
+
+        .alert-error {
+            color: rgb(101, 54, 54);
+            background-color: rgba(224, 137, 137, 0.637);
+        }
+
+        .resend-div {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 20px;
+        }
+        .resend-div a{
+            display: none;
+        }
+
+        .time {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container bgWhite">
+        <%- include('../partials/flash') %>
+            <div class="title">
+                Verify OTP
+            </div>
+            <form action="/register/verify" method="post" class="mt-5">
+                <div class="digit-cont">
+                    <input class="otp" type="text" oninput='digitValidate(this)' onkeyup='tabChange(1)' maxlength=1
+                        name="d1">
+                    <input class="otp" type="text" oninput='digitValidate(this)' onkeyup='tabChange(2)' maxlength=1
+                        name="d2">
+                    <input class="otp" type="text" oninput='digitValidate(this)' onkeyup='tabChange(3)' maxlength=1
+                        name="d3">
+                    <input class="otp" type="text" oninput='digitValidate(this)' onkeyup='tabChange(4)' maxlength=1
+                        name="d4">
+                </div>
+                <div class="resend-div">
+                    <div class="time">00:30</div>
+                    <a href="/register/verify/resend">Resend</a>
+                </div>
+                <button class="customBtn">Verify</button>
+            </form>
+    </div>
+
+    <script>
+        let digitValidate = function (ele) {
+            console.log(ele.value);
+            ele.value = ele.value.replace(/[^0-9]/g, '');
+        }
+
+        let tabChange = function (val) {
+            let ele = document.querySelectorAll('input');
+            if (ele[val - 1].value != '') {
+                ele[val].focus()
+            } else if (ele[val - 1].value == '') {
+                ele[val - 2].focus()
+            }
+        }
+        function toMMSS (t) {
+            if(t==0) return '00:00';
+
+            else return `00:${t}`;
+        }
+
+        const time = document.querySelector('.time');
+        const resend = document.querySelector('.resend-div a');
+        let t = 29;
+        const i = setInterval(() => {
+            const timeString = toMMSS(t);
+            time.innerHTML = timeString;
+            if (t == 0) {
+
+                resend.style.display='block';
+                clearInterval(i);
+                return;
+            }
+            t--;
+        }, 1000)
+
+
+    </script>
+</body>
+
+</html>

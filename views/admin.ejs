@@ -9,7 +9,7 @@
 
     <style>
         body {
-            background: linear-gradient(rgba(2, 226, 247, 0.507), rgba(255, 255, 255, 0.419));
+            background-color: aliceblue;
             background-repeat: no-repeat;
             min-height: 100vh;
         }
@@ -18,16 +18,30 @@
             box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.616);
             margin: 0 auto;
             width: fit-content;
-            padding: 20px 20px;
+            padding: 30px 40px;
             margin-top: 100px;
+
+            background-color: #4481eb;
+            border-radius: 10px;
+        }
+        h2 {
+            color: rgb(255, 255, 255);
+        }
+
+        .btn-cont {
+            text-align: center;
+            
         }
 
         a {
             text-decoration: none;
-            border: 1px solid rgb(255, 255, 255);
+            border: none;
             font-size: 28px;
-            color: rgb(12, 97, 66);
+            color: white;
             padding: 0.25em 0.75em;
+            background-color: black;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgb(227, 147, 147);
         }
 
         .alert-success {
@@ -51,7 +65,7 @@
 <body>
     <%- include('../partials/flash') %>
         <div class="container">
-            <h2>Welcome, <%= user.email %>
+            <h2>Welcome, <%= user %>
             </h2>
             <div class="btn-cont">
                 <a href="/logout">Logout</a>
