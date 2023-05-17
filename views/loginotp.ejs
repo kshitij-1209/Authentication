@@ -88,7 +88,8 @@
             width: 100%;
             font-size: 20px;
         }
-        .resend-div a{
+
+        .resend-div a {
             display: none;
         }
 
@@ -116,7 +117,15 @@
                         name="d4">
                 </div>
                 <div class="resend-div">
-                    <div class="time">00:30</div>
+                    <div class="time" exp="<%= exp %>">
+        
+                        <% if(exp=="null" || exp=="0") { %>
+                            1:00
+                        <% } else { %>
+                            00:<%= exp %>
+                        <% } %>
+
+                    </div>
                     <a href="/login/verify/resend">Resend</a>
                 </div>
                 <button class="customBtn">Verify</button>
@@ -137,26 +146,34 @@
                 ele[val - 2].focus()
             }
         }
-        function toMMSS (t) {
-            if(t==0) return '00:00';
+        function toMMSS(t) {
+            if (t == 0) return '00:00';
 
             else return `00:${t}`;
         }
 
         const time = document.querySelector('.time');
         const resend = document.querySelector('.resend-div a');
-        let t = 29;
-        const i = setInterval(() => {
-            const timeString = toMMSS(t);
-            time.innerHTML = timeString;
-            if (t == 0) {
+        let t = time.getAttribute('exp');
+        
+        // console.log(t, typeof(t));
 
-                resend.style.display='block';
-                clearInterval(i);
-                return;
-            }
-            t--;
-        }, 1000)
+        if(t!="null"){
+            t=Number(t) - 1;
+            const i = setInterval(() => {
+                const timeString = toMMSS(t);
+                time.innerHTML = timeString;
+                if (t == 0) {
+                    // resend.style.display = 'block';
+                    clearInterval(i);
+                    return;
+                }
+                t--;
+            }, 1000)
+        } else {
+            resend.style.display = 'block';
+        }
+    
 
 
     </script>

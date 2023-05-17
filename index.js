@@ -11,8 +11,8 @@ const isLoggedIn = require('./middleware');
 const session = require('express-session');
 
 const User = require('./models/user');
-const RegisterOtp = require('./models/registerOtp');
-const LoginOtp = require('./models/loginOtp');
+const Otp = require('./models/Otp');
+// const LoginOtp = require('./models/loginOtp');
 
 const ExpressError = require('./utils/expressError');
 const catchAsync = require('./utils/catchAsync');
@@ -80,8 +80,8 @@ app.post('/login', catchAsync( async(req, res) => {
         req.session.verified = null;
 
 
-        const otp = new RegisterOtp({
-            expiresAt : Date.now() + 1000 * 30,
+        const otp = new Otp({
+            expiresAt : Date.now() + 1000 * 60,
             password: generateOtp()
         })
         otp.user_id = user;
@@ -95,7 +95,16 @@ app.post('/login', catchAsync( async(req, res) => {
 
 
 app.get('/login/verify', catchAsync(async (req, res) => {
-    res.render('loginotp');
+    const activeUser = await User.findOne({'email': req.session.user});
+    const otp = await Otp.findOne({'user_id': activeUser});
+    if(!otp) {
+        exp="null";
+    }
+    else {
+        exp=parseInt((otp.expiresAt - Date.now())/1000);
+    }
+    console.log('exp : ',exp);
+    res.render('loginotp', { exp });
 }))
 
 
@@ -105,29 +114,27 @@ app.post('/login/verify', catchAsync(async (req, res) => {
     
     const activeUser = await User.findOne({'email': req.session.user});
     
-    const otp = await RegisterOtp.findOne({'user_id': activeUser});
+    const otp = await Otp.findOne({'user_id': activeUser});
+
+    if(!otp) {
+        req.flash('error', 'Otp Expired !!! Resend it.');
+        return res.redirect('/login/verify');
+    }
 
     if(otp.expiresAt > Date.now()) {
         if(otp.password !== userOtp) {
             req.flash('error', 'Incorrect Otp !!!');
             return res.redirect('/login/verify');
         } else {
-
-            // await User.findOneAndUpdate({'email': req.session.user}, {'verified': true}, {new: true}).then((d) => console.log(d));
-            
             req.session.verified=true;
-            await RegisterOtp.deleteMany({'user_id': activeUser});
-
-            // req.session.user = null;
-            
-            // req.flash('success', 'You are successfully verified.\n Please login with your credentials !!!');
+            await Otp.deleteMany({'user_id': activeUser});
 
             res.redirect('/admin');
         }
     } else {
-        await RegisterOtp.deleteMany({'user_id': activeUser});
+        await Otp.deleteMany({'user_id': activeUser});
 
-        req.flash('error', 'Otp expired !!!. Resend it');
+        req.flash('error', 'Otp expired !!! Resend it');
         res.redirect('/login/verify');
     }
 }))
@@ -135,8 +142,8 @@ app.post('/login/verify', catchAsync(async (req, res) => {
 app.get('/login/verify/resend', catchAsync(async (req, res) => {
     const currentUser = await User.findOne({'email': req.session.user});
 
-    const otp = new RegisterOtp({
-        expiresAt : Date.now() + 1000 * 30,
+    const otp = new Otp({
+        expiresAt : Date.now() + 1000 * 60,
         password: generateOtp()
     })
     otp.user_id = currentUser;
@@ -149,7 +156,16 @@ app.get('/login/verify/resend', catchAsync(async (req, res) => {
 // ----------------------------------------- register
 
 app.get('/register/verify', catchAsync(async (req, res) => {
-    res.render('otp');
+    const activeUser = await User.findOne({'email': req.session.user});
+    const otp = await Otp.findOne({'user_id': activeUser});
+
+    if(!otp) {
+        exp="null";
+    }
+    else {
+        exp=parseInt((otp.expiresAt - Date.now())/1000);
+    }
+    res.render('otp', { exp });
 }))
 
 
@@ -161,14 +177,14 @@ app.post('/register', catchAsync(async (req, res, next) => {
     const ifExists = await user.checkExists();
     if(ifExists) {
         req.flash('error', 'Username or email already exists !!!');
-        return req.redirect('/');
+        return res.redirect('/');
     }
     const x = await user.save();
 
     req.session.user = email;
 
-    const otp = new RegisterOtp({
-        expiresAt : Date.now() + 1000 * 30,
+    const otp = new Otp({
+        expiresAt : Date.now() + 1000 * 60,
         password: generateOtp()
     })
     otp.user_id = user;
@@ -184,7 +200,12 @@ app.post('/register/verify', catchAsync(async (req, res) => {
     
     const activeUser = await User.findOne({'email': req.session.user});
     
-    const otp = await RegisterOtp.findOne({'user_id': activeUser});
+    const otp = await Otp.findOne({'user_id': activeUser});
+
+    if(!otp) {
+        req.flash('error', 'Otp Expired !!! Resend it.');
+        return res.redirect('/register/verify');
+    }
 
     if(otp.expiresAt > Date.now()) {
         if(otp.password !== userOtp) {
@@ -194,7 +215,7 @@ app.post('/register/verify', catchAsync(async (req, res) => {
 
             await User.findOneAndUpdate({'email': req.session.user}, {'verified': true}, {new: true}).then((d) => console.log(d));
 
-            await RegisterOtp.deleteMany({'user_id': activeUser});
+            await Otp.deleteMany({'user_id': activeUser});
 
             req.session.user = null;
             req.session.verified = null;
@@ -204,9 +225,9 @@ app.post('/register/verify', catchAsync(async (req, res) => {
             res.redirect('/');
         }
     } else {
-        await RegisterOtp.deleteMany({'user_id': activeUser});
+        await Otp.deleteMany({'user_id': activeUser});
 
-        req.flash('error', 'Otp expired !!!. Resend it');
+        req.flash('error', 'Otp expired !!! Resend it');
         res.redirect('/register/verify');
     }
 }))
@@ -214,8 +235,8 @@ app.post('/register/verify', catchAsync(async (req, res) => {
 app.get('/register/verify/resend', catchAsync(async (req, res) => {
     const currentUser = await User.findOne({'email': req.session.user});
 
-    const otp = new RegisterOtp({
-        expiresAt : Date.now() + 1000 * 30,
+    const otp = new Otp({
+        expiresAt : Date.now() + 1000 * 60,
         password: generateOtp()
     })
     otp.user_id = currentUser;
@@ -240,7 +261,7 @@ app.get('/logout', (req, res) => {
         req.session.user=null;
         req.session.verified=null;
         req.flash('success', 'GoodBye !!!');
-        res.redirect('/');
+        return res.redirect('/');
     }
 
     res.send('Already logged out');
