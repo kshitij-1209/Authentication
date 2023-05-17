@@ -116,7 +116,15 @@
                         name="d4">
                 </div>
                 <div class="resend-div">
-                    <div class="time">00:30</div>
+                    <div class="time" exp="<%= exp %>">
+                    
+                        <% if(exp=="null" || exp=="0") { %>
+                            1:00
+                        <% } else { %>
+                            00:<%= exp %>
+                        <% } %>
+
+                    </div>
                     <a href="/register/verify/resend">Resend</a>
                 </div>
                 <button class="customBtn">Verify</button>
@@ -145,18 +153,23 @@
 
         const time = document.querySelector('.time');
         const resend = document.querySelector('.resend-div a');
-        let t = 29;
-        const i = setInterval(() => {
-            const timeString = toMMSS(t);
-            time.innerHTML = timeString;
-            if (t == 0) {
-
-                resend.style.display='block';
-                clearInterval(i);
-                return;
-            }
-            t--;
-        }, 1000)
+        let t = time.getAttribute('exp');
+        
+        if(t!="null"){
+            t=Number(t) - 1;
+            const i = setInterval(() => {
+                const timeString = toMMSS(t);
+                time.innerHTML = timeString;
+                if (t == 0) {
+                    // resend.style.display = 'block';
+                    clearInterval(i);
+                    return;
+                }
+                t--;
+            }, 1000)
+        } else {
+            resend.style.display = 'block';
+        }
 
 
     </script>
